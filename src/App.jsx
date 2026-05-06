@@ -1436,6 +1436,7 @@ export default function App() {
 // Sub-component for Recall Drills to handle individual toggle state
 function DrillCard({ drill, num, status, onStatusChange }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
 
   // Status visual indicators
   const borderStatusClass = status === 'remembered' ? 'border-l-4 border-l-emerald-500' : 
@@ -1492,11 +1493,22 @@ function DrillCard({ drill, num, status, onStatusChange }) {
              <button 
                 onClick={() => {
                   navigator.clipboard.writeText(`Q: ${drill.q}\nA: ${drill.a}`);
-                  alert("Đã copy nội dung! Bạn có thể dán (Ctrl+V) vào khung chat AI.");
+                  setIsCopied(true);
+                  setTimeout(() => setIsCopied(false), 2000);
                 }}
-                className="text-xs text-slate-500 hover:text-blue-600 font-medium transition-colors flex items-center gap-1"
+                className={`text-xs font-medium transition-colors flex items-center gap-1 ${
+                  isCopied ? 'text-emerald-600' : 'text-slate-500 hover:text-blue-600'
+                }`}
              >
-                <Copy className="w-3.5 h-3.5" /> Copy để hỏi AI sâu hơn
+                {isCopied ? (
+                  <>
+                    <Check className="w-3.5 h-3.5" /> Đã copy thành công
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3.5 h-3.5" /> Copy để hỏi AI sâu hơn
+                  </>
+                )}
              </button>
           </div>
         </div>
