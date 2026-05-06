@@ -1489,8 +1489,14 @@ function DrillCard({ drill, num, status, onStatusChange }) {
                 </button>
              </div>
              
-             <button className="text-xs text-slate-500 hover:text-blue-600 font-medium transition-colors flex items-center gap-1">
-                <BrainCircuit className="w-3.5 h-3.5" /> Hỏi AI sâu hơn
+             <button 
+                onClick={() => {
+                  navigator.clipboard.writeText(`Q: ${drill.q}\nA: ${drill.a}`);
+                  alert("Đã copy nội dung! Bạn có thể dán (Ctrl+V) vào khung chat AI.");
+                }}
+                className="text-xs text-slate-500 hover:text-blue-600 font-medium transition-colors flex items-center gap-1"
+             >
+                <Copy className="w-3.5 h-3.5" /> Copy để hỏi AI sâu hơn
              </button>
           </div>
         </div>
