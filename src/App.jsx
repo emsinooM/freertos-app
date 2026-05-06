@@ -281,6 +281,43 @@ void vTaskUseResource(void *pvParameters) {
         vTaskDelay(pdMS_TO_TICKS(10));
     }
 }`
+      },
+      {
+        topic: "4. Đồng bộ đa sự kiện với Event Groups",
+        content: "Khi một Task cần chờ đợi NHIỀU điều kiện xảy ra cùng lúc (hoặc một trong nhiều điều kiện), dùng Queue hay Semaphore sẽ rất phức tạp. Event Groups cung cấp một tập hợp các cờ (flags - được lưu dưới dạng từng bit trong một số nguyên). Task có thể 'block' để chờ một tổ hợp bit cụ thể (ví dụ: chờ bit 0 VÀ bit 1 đều được set).",
+        code: `EventGroupHandle_t xEventGroup;
+
+// Định nghĩa các cờ (flags) là các bit
+#define BIT_WIFI_CONNECTED    ( 1 << 0 ) // Bit 0
+#define BIT_MQTT_CONNECTED    ( 1 << 1 ) // Bit 1
+
+void vTaskSystemReady(void *pvParameters) {
+    // Khởi tạo Event Group
+    xEventGroup = xEventGroupCreate();
+    
+    for(;;) {
+        // Chờ ĐỒNG THỜI cả WiFi và MQTT kết nối thành công
+        // Các tham số: EventGroup, Bits cần chờ, Clear on exit (Xóa bit sau khi thỏa mãn), Wait for all bits (Chờ tất cả)
+        EventBits_t uxBits = xEventGroupWaitBits(
+            xEventGroup, 
+            BIT_WIFI_CONNECTED | BIT_MQTT_CONNECTED, 
+            pdTRUE,  
+            pdTRUE,  
+            portMAX_DELAY
+        );
+        
+        printf("He thong da san sang! (WiFi & MQTT OK)\\n");
+        // ... thực hiện công việc chính ...
+    }
+}
+
+void vTaskWiFi(void *pvParameters) {
+    // ... code kết nối WiFi ...
+    
+    // Set cờ báo WiFi đã kết nối (báo hiệu cho Task khác)
+    xEventGroupSetBits(xEventGroup, BIT_WIFI_CONNECTED);
+    vTaskDelete(NULL);
+}`
       }
     ]
   },
